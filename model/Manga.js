@@ -20,4 +20,3 @@ const mangaSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.models.Manga || mongoose.model('Manga', mangaSchema);
-//
