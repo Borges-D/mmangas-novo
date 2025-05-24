@@ -1,62 +1,135 @@
+
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Usuario = require('../model/Usuario'); // corrigido: nome maiúsculo
+const { Usuario } = require('../model/db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secretdesenvolvimento';
-
+// Rota de registro
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
-        // Verificar se já existe usuário
-        const existingUser = await Usuario.findOne({ email });
-        if (existingUser) return res.status(400).json({ msg: 'Usuário já existe' });
+        // Validação básica
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                msg: 'Por favor, preencha todos os campos obrigatórios'
+            });
+        }
 
-        // Criptografar senha
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        // Verificar se já existe usuário com mesmo email ou username
+        const existingUser = await Usuario.findOne({
+            $or: [{ email }, { username }]
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                msg: existingUser.email === email ?
+                    'Email já cadastrado' :
+                    'Nome de usuário já está em uso'
+            });
+        }
 
         // Criar novo usuário
         const newUser = new Usuario({
             username,
             email,
-            password: hashedPassword,
+            password,
+            mangasLidos: 0,
+            level: 1,
+            experiencia: 0,
+            rankSemana: 0,
+            capituloslidos: []
         });
 
         await newUser.save();
 
-        res.status(201).json({ msg: 'Usuário criado com sucesso' });
+        res.status(201).json({
+            msg: 'Usuário criado com sucesso',
+            user: {
+                id: newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                mangasLidos: newUser.mangasLidos,
+                level: newUser.level
+            }
+        });
+
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: 'Erro no servidor' });
+        console.error('Erro no registro:', err);
+        res.status(500).json({
+            msg: 'Erro ao criar usuário',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
 });
 
+// Rota de login
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Verificar usuário
+        // Validação básica
+        if (!email || !password) {
+            return res.status(400).json({
+                msg: 'Por favor, forneça email e senha'
+            });
+        }
+
+        // Buscar usuário
         const user = await Usuario.findOne({ email });
-        if (!user) return res.status(400).json({ msg: 'Usuário não encontrado' });
+        if (!user) {
+            return res.status(400).json({
+                msg: 'Usuário não encontrado'
+            });
+        }
 
-        // Validar senha
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ msg: 'Senha incorreta' });
+        // Atualizar último acesso
+        user.ultimoAcesso = new Date();
+        await user.save();
 
-        // Criar token JWT
-        const token = jwt.sign(
-            { id: user._id, username: user.username },
-            JWT_SECRET,
-            { expiresIn: '1d' }
-        );
+        res.json({
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                mangasLidos: user.mangasLidos,
+                level: user.level
+            }
+        });
 
-        res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: 'Erro no servidor' });
+        console.error('Erro no login:', err);
+        res.status(500).json({
+            msg: 'Erro ao realizar login',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+});
+
+// Rota para verificar status do usuário
+router.get('/status/:id', async (req, res) => {
+    try {
+        const user = await Usuario.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({
+                msg: 'Usuário não encontrado'
+            });
+        }
+
+        res.json({
+            user: {
+                id: user._id,
+                username: user.username,
+                mangasLidos: user.mangasLidos,
+                level: user.level,
+                experiencia: user.experiencia,
+                rankSemana: user.rankSemana
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: 'Erro ao buscar status do usuário',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
 });
 
