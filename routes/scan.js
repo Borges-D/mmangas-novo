@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const scan = require('../model/Scan');
+const Scan = require('../model/Scan');
 
 // Criar uma scan
 router.post('/', async (req, res) => {
@@ -23,10 +23,10 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Buscar scan por id
-router.get('/:id', async (req, res) => {
+// Buscar scan por slug (em vez de id)
+router.get('/:slug', async (req, res) => {
     try {
-        const scan = await Scan.findById(req.params.id);
+        const scan = await Scan.findOne({ slug: req.params.slug });
         if (!scan) return res.status(404).json({ message: 'Scan não encontrada' });
         res.json(scan);
     } catch (err) {
@@ -34,10 +34,10 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Atualizar scan
-router.put('/:id', async (req, res) => {
+// Atualizar scan por slug
+router.put('/:slug', async (req, res) => {
     try {
-        const scanAtualizada = await Scan.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const scanAtualizada = await Scan.findOneAndUpdate({ slug: req.params.slug }, req.body, { new: true });
         if (!scanAtualizada) return res.status(404).json({ message: 'Scan não encontrada' });
         res.json(scanAtualizada);
     } catch (err) {
@@ -45,10 +45,10 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Deletar scan
-router.delete('/:id', async (req, res) => {
+// Deletar scan por slug
+router.delete('/:slug', async (req, res) => {
     try {
-        const scanDeletada = await Scan.findByIdAndDelete(req.params.id);
+        const scanDeletada = await Scan.findOneAndDelete({ slug: req.params.slug });
         if (!scanDeletada) return res.status(404).json({ message: 'Scan não encontrada' });
         res.json({ message: 'Scan deletada com sucesso' });
     } catch (err) {
