@@ -1,17 +1,25 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const usuarioSchema = new mongoose.Schema({
-    nome: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    senhaHash: { type: String, required: true },
-    scan: { type: mongoose.Schema.Types.ObjectId, ref: 'Scan' }, // scan que o usuário pertence, se for scan
-    perfilPublico: { type: Boolean, default: true },
-    rank: {
-        level: { type: Number, default: 1 },
-        mangasLidos: { type: Number, default: 0 },
-        pontosSemana: { type: Number, default: 0 },
-        pontosDia: { type: Number, default: 0 }
-    }
+    username: { type: String, required: true, unique: true },
+    email:    { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role:     { type: String, enum: ['scan', 'user'], default: 'user' },
+    // outros campos (perfil, rank, etc)
 });
 
-module.exports = mongoose.models.Usuario || mongoose.model('Usuario', usuarioSchema);
+// Hash da senha antes de salvar
+usuarioSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
+
+// Metodo para comparar senha
+usuarioSchema.methods.comparePassword = function(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
+
+module.exports = mongoose.model('Usuario', usuarioSchema);

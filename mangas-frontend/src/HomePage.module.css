@@ -1,0 +1,153 @@
+/* src/pages/HomePage.module.css */
+
+.container {
+    background-color: #0b0b0b;
+    color: #e0e0e0;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #121212;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    height: 60px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    z-index: 100;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 24px;
+    color: #f68b1e; /* laranja Crunchyroll */
+    letter-spacing: 2px;
+    cursor: pointer;
+}
+
+.navLinks {
+    display: flex;
+    gap: 25px;
+}
+
+.navLink {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.navLink:hover {
+    color: #f68b1e;
+}
+
+.mainContent {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 30px;
+    margin-top: 80px; /* para o header fixo */
+    padding: 0 30px 30px;
+}
+
+.mangaGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(180px,1fr));
+    gap: 20px;
+}
+
+.mangaCard {
+    background: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.6);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mangaCard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgb(246 139 30 / 0.8);
+}
+
+.mangaImg {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-bottom: 1px solid #333;
+}
+
+.mangaInfo {
+    padding: 12px 15px;
+}
+
+.mangaTitle {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: #f68b1e;
+}
+
+.mangaAuthor {
+    font-size: 13px;
+    color: #aaa;
+}
+
+.rankBox {
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.5);
+}
+
+.rankTitle {
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #f68b1e;
+    padding-bottom: 8px;
+}
+
+.rankItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: color 0.25s ease;
+}
+
+.rankItem:hover {
+    color: #f68b1e;
+}
+
+.rankPosition {
+    font-weight: 700;
+    width: 30px;
+}
+
+.rankName {
+    flex-grow: 1;
+    font-weight: 600;
+}
+
+.rankPoints {
+    font-weight: 700;
+    color: #f68b1e;
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .mainContent {
+        grid-template-columns: 1fr;
+    }
+
+    .rankBox {
+        margin-top: 30px;
+    }
+}
