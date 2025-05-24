@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const mangaSchema = new mongoose.Schema({
     titulo: { type: String, required: true },
+    slug: { type: String, required: true, unique: true }, // slug para URL amigável
     descricao: String,
     autor: String,
     generos: [String],
@@ -15,7 +16,7 @@ const mangaSchema = new mongoose.Schema({
         }
     ],
     criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-    scan: { type: mongoose.Schema.Types.ObjectId, ref: 'Scan' }
+    scanSlug: { type: String, required: true } // Agora usamos o slug da Scan, e não o ObjectId
 }, { timestamps: true });
 
 module.exports = mongoose.models.Manga || mongoose.model('Manga', mangaSchema);
