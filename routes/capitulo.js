@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Capitulo = require('../model/Capitulo');
+const Manga = require('../model/Manga'); // Importa o modelo Manga
 
 // Criar capítulo
 router.post('/', async (req, res) => {
@@ -13,10 +14,23 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Listar capítulos
+// Listar capítulos filtrando por mangaSlug
 router.get('/', async (req, res) => {
     try {
-        const capitulos = await Capitulo.find().populate('manga');
+        const { mangaSlug } = req.query;
+
+        if (!mangaSlug) {
+            return res.status(400).json({ message: 'Parâmetro mangaSlug é obrigatório' });
+        }
+
+        // Buscar mangá pelo slug
+        const manga = await Manga.findOne({ slug: mangaSlug });
+        if (!manga) {
+            return res.status(404).json({ message: 'Mangá não encontrado' });
+        }
+
+        // Buscar capítulos pelo id do mangá
+        const capitulos = await Capitulo.find({ manga: manga._id }).sort({ numero: 1 });
         res.json(capitulos);
     } catch (err) {
         res.status(500).json({ error: err.message });

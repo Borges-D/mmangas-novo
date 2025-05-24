@@ -9,14 +9,13 @@ app.use(express.json());
 
 // Importar rotas
 const mangasRoutes = require('./routes/mangas');
-const scansRoutes = require('./routes/scan');
 const usuariosRoutes = require('./routes/usuario');
 const capitulosRoutes = require('./routes/capitulo');
 const authRoutes = require('./routes/auth');
 
+
 // Usar rotas
 app.use('/api/mangas', mangasRoutes);
-app.use('/api/scans', scansRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/capitulos', capitulosRoutes);
 app.use('/api/auth', authRoutes);

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Usuario = require('../model/Usuario');
+const autenticarToken = require('../middleware/autenticarToken');
 
-// Criar usuário
+// Criar usuário (rota pública)
 router.post('/', async (req, res) => {
     try {
         const novoUsuario = new Usuario(req.body);
@@ -13,8 +14,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Listar todos usuários
-router.get('/', async (req, res) => {
+// Listar todos usuários (protegida)
+router.get('/', autenticarToken, async (req, res) => {
     try {
         const usuarios = await Usuario.find();
         res.json(usuarios);
@@ -23,8 +24,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Buscar usuário por id
-router.get('/:id', async (req, res) => {
+// Buscar usuário por id (protegida)
+router.get('/:id', autenticarToken, async (req, res) => {
     try {
         const usuario = await Usuario.findById(req.params.id);
         if (!usuario) return res.status(404).json({ message: 'Usuário não encontrado' });
@@ -34,8 +35,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Atualizar usuário
-router.put('/:id', async (req, res) => {
+// Atualizar usuário (protegida)
+router.put('/:id', autenticarToken, async (req, res) => {
     try {
         const usuarioAtualizado = await Usuario.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!usuarioAtualizado) return res.status(404).json({ message: 'Usuário não encontrado' });
@@ -45,8 +46,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Deletar usuário
-router.delete('/:id', async (req, res) => {
+// Deletar usuário (protegida)
+router.delete('/:id', autenticarToken, async (req, res) => {
     try {
         const usuarioDeletado = await Usuario.findByIdAndDelete(req.params.id);
         if (!usuarioDeletado) return res.status(404).json({ message: 'Usuário não encontrado' });

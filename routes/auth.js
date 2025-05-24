@@ -2,14 +2,16 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const usuario = require('../model/usuario');
+const Usuario = require('../model/Usuario'); // corrigido: nome maiúsculo
+
+const JWT_SECRET = process.env.JWT_SECRET || 'secretdesenvolvimento';
 
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
         // Verificar se já existe usuário
-        const existingUser = await usuario.findOne({ email });
+        const existingUser = await Usuario.findOne({ email });
         if (existingUser) return res.status(400).json({ msg: 'Usuário já existe' });
 
         // Criptografar senha
@@ -47,7 +49,7 @@ router.post('/login', async (req, res) => {
         // Criar token JWT
         const token = jwt.sign(
             { id: user._id, username: user.username },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: '1d' }
         );
 
