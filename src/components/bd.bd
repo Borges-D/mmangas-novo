@@ -1,0 +1,19 @@
+// Exemplo de criação de usuários com dados de ranking
+const usuario1 = new Usuario({
+    username: "leitor1",
+    email: "leitor1@teste.com",
+    password: "senha123",
+    mangasLidos: 10,
+    level: 5
+});
+
+const usuario2 = new Usuario({
+    username: "leitor2",
+    email: "leitor2@teste.com",
+    password: "senha123",
+    mangasLidos: 15,
+    level: 7
+});
+
+await usuario1.save();
+await usuario2.save();

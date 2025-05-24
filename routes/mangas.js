@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Manga = require('../model/Manga');
 const Joi = require('joi');
-
+const { Usuario } = require('../model/db');
 
 // Schema Joi para validação do Manga
 const mangaSchema = Joi.object({

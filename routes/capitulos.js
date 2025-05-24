@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const Capitulo = require('../model/Capitulo');
+const Capitulos = require('../model/Capitulo');
 const Manga = require('../model/Manga'); // Importa o modelo Manga
+const { Usuario } = require('../model/db');
+
 
 // Criar capítulo
 router.post('/', async (req, res) => {
     try {
-        const novoCapitulo = new Capitulo(req.body);
+        const novoCapitulo = new Capitulos(req.body);
         const salvoCapitulo = await novoCapitulo.save();
         res.status(201).json(salvoCapitulo);
     } catch (err) {
@@ -30,7 +32,7 @@ router.get('/', async (req, res) => {
         }
 
         // Buscar capítulos pelo id do mangá
-        const capitulos = await Capitulo.find({ manga: manga._id }).sort({ numero: 1 });
+        const capitulos = await Capitulos.find({ manga: manga._id }).sort({ numero: 1 });
         res.json(capitulos);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -40,7 +42,7 @@ router.get('/', async (req, res) => {
 // Buscar capítulo por id
 router.get('/:id', async (req, res) => {
     try {
-        const capitulo = await Capitulo.findById(req.params.id).populate('manga');
+        const capitulo = await Capitulos.findById(req.params.id).populate('manga');
         if (!capitulo) return res.status(404).json({ message: 'Capítulo não encontrado' });
         res.json(capitulo);
     } catch (err) {
@@ -51,7 +53,7 @@ router.get('/:id', async (req, res) => {
 // Atualizar capítulo
 router.put('/:id', async (req, res) => {
     try {
-        const capituloAtualizado = await Capitulo.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const capituloAtualizado = await Capitulos.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!capituloAtualizado) return res.status(404).json({ message: 'Capítulo não encontrado' });
         res.json(capituloAtualizado);
     } catch (err) {
@@ -62,7 +64,7 @@ router.put('/:id', async (req, res) => {
 // Deletar capítulo
 router.delete('/:id', async (req, res) => {
     try {
-        const capituloDeletado = await Capitulo.findByIdAndDelete(req.params.id);
+        const capituloDeletado = await Capitulos.findByIdAndDelete(req.params.id);
         if (!capituloDeletado) return res.status(404).json({ message: 'Capítulo não encontrado' });
         res.json({ message: 'Capítulo deletado com sucesso' });
     } catch (err) {
